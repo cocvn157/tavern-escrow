@@ -75,14 +75,15 @@ export const DeployAuditHub: React.FC<DeployAuditHubProps> = ({ state, selectedB
       {/* gnokey CLI Config */}
       <div className="panel">
         <div className="panel-header">
-          <div>
+          <div style={{ flex: '1 1 360px' }}>
             <h3 className="panel-title">
               <Terminal size={17} color="var(--amber-400)" />
-              `gnokey` Deployment &amp; Transaction Generator
+              gnokey Deployment &amp; Transaction Generator
             </h3>
             <p style={{ margin: '4px 0 0', fontSize: '0.83rem', color: 'var(--text-secondary)' }}>
-              Targets live Gno.land networks (`onyx-1` / `gnoland-1`). On permissionless testnets,
-              use your `g1...` wallet address as namespace if you do not hold a registered handle.
+              Targets live Gno.land networks (<code>onyx-1</code> / <code>gnoland-1</code>). On
+              permissionless testnets, use your <code>g1...</code> wallet address as namespace if
+              you do not hold a registered handle.
             </p>
           </div>
           <button type="button" className="btn btn-emerald" onClick={downloadProof}>
@@ -112,7 +113,7 @@ export const DeployAuditHub: React.FC<DeployAuditHubProps> = ({ state, selectedB
           </div>
           <div>
             <label htmlFor="cli-namespace" className="field-label">
-              Namespace (`g1...` address or handle)
+              Namespace (<code>g1...</code> address or handle)
             </label>
             <input
               id="cli-namespace"
@@ -124,7 +125,7 @@ export const DeployAuditHub: React.FC<DeployAuditHubProps> = ({ state, selectedB
           </div>
           <div>
             <label htmlFor="cli-key" className="field-label">
-              `gnokey` Key Name
+              gnokey Key Name
             </label>
             <input
               id="cli-key"
@@ -159,7 +160,7 @@ export const DeployAuditHub: React.FC<DeployAuditHubProps> = ({ state, selectedB
         </div>
 
         <div style={{ fontSize: '0.8rem', marginBottom: 14, color: 'var(--text-secondary)' }}>
-          Target `gnoweb` URL:{' '}
+          Target gnoweb URL:{' '}
           <code className="mono" style={{ color: 'var(--sky-400)' }}>
             {buildGnowebUrl(network, namespace)}
           </code>
@@ -169,7 +170,7 @@ export const DeployAuditHub: React.FC<DeployAuditHubProps> = ({ state, selectedB
           <div>
             <div className="panel-header" style={{ marginBottom: 6 }}>
               <span className="field-label" style={{ marginBottom: 0 }}>
-                1. Deploy Realm (`maketx addpkg`)
+                1. Deploy Realm (<code>maketx addpkg</code>)
               </span>
               <button
                 type="button"
@@ -186,7 +187,7 @@ export const DeployAuditHub: React.FC<DeployAuditHubProps> = ({ state, selectedB
           <div>
             <div className="panel-header" style={{ marginBottom: 6 }}>
               <span className="field-label" style={{ marginBottom: 0 }}>
-                2. Invoke Selected Bounty (`maketx call`)
+                2. Invoke Selected Bounty (<code>maketx call</code>)
               </span>
               <button
                 type="button"
@@ -204,7 +205,7 @@ export const DeployAuditHub: React.FC<DeployAuditHubProps> = ({ state, selectedB
         <div style={{ marginTop: 12 }}>
           <div className="panel-header" style={{ marginBottom: 6 }}>
             <span className="field-label" style={{ marginBottom: 0 }}>
-              3. Read-Only `vm/qrender` Query (Zero Gas)
+              3. Read-Only <code>vm/qrender</code> Query (Zero Gas)
             </span>
             <button
               type="button"
@@ -224,7 +225,7 @@ export const DeployAuditHub: React.FC<DeployAuditHubProps> = ({ state, selectedB
         <div className="panel-header">
           <h3 className="panel-title">
             <FileCode2 size={17} color="var(--sky-400)" />
-            Gno Realm Source Inspector (`gno/r/cocvn157/tavernescrow`)
+            Gno Realm Source Inspector (<code>gno/r/cocvn157/tavernescrow</code>)
           </h3>
           <div style={{ display: 'flex', flexWrap: 'wrap', gap: 6 }}>
             {GNO_SOURCE_FILES.map((file) => (

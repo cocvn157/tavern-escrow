@@ -133,7 +133,7 @@ export const EscrowWorkbench: React.FC<EscrowWorkbenchProps> = ({
       <div className="actor-bar">
         <div className="actor-controls">
           <label htmlFor="actor-select" className="field-label" style={{ marginBottom: 0 }}>
-            Active Caller (`cur.Previous()`):
+            Active Caller (<code>cur.Previous()</code>):
           </label>
           <select
             id="actor-select"
@@ -175,7 +175,7 @@ export const EscrowWorkbench: React.FC<EscrowWorkbenchProps> = ({
           <div className="panel-header">
             <h3 className="panel-title">
               <Coins size={16} color="var(--amber-400)" />
-              Fund New Escrow (`CreateBounty`)
+              Fund New Escrow (<code>CreateBounty</code>)
             </h3>
             <span className="pill pill-amber">Caller: {activeActor.label}</span>
           </div>
@@ -267,7 +267,7 @@ export const EscrowWorkbench: React.FC<EscrowWorkbenchProps> = ({
             </div>
             <div>
               <label htmlFor="bounty-send" className="field-label">
-                Attached `-send` (ugnot, must equal exact sum)
+                Attached <code>-send</code> (ugnot, must equal exact sum)
               </label>
               <input
                 id="bounty-send"
@@ -280,7 +280,7 @@ export const EscrowWorkbench: React.FC<EscrowWorkbenchProps> = ({
             <div style={{ display: 'flex', alignItems: 'flex-end', gap: 10 }}>
               <button type="submit" className="btn btn-primary">
                 <Coins size={15} />
-                Broadcast `CreateBounty`
+                Broadcast CreateBounty
               </button>
             </div>
           </div>
@@ -410,7 +410,7 @@ export const EscrowWorkbench: React.FC<EscrowWorkbenchProps> = ({
             <div className="form-grid" style={{ marginBottom: 14 }}>
               <div>
                 <label htmlFor="proof-uri-input" className="field-label">
-                  Deliverable Proof URI (`SubmitMilestone`)
+                  Deliverable Proof URI (<code>SubmitMilestone</code>)
                 </label>
                 <input
                   id="proof-uri-input"
