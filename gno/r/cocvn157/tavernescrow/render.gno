@@ -24,7 +24,7 @@ func Render(path string) string {
 	case len(parts) == 2 && parts[0] == "bounty":
 		id, err := strconv.ParseUint(parts[1], 10, 64)
 		if err != nil || id == 0 {
-			return "# 404 — Invalid Bounty ID\n\nExpected `/r/cocvn157/tavernescrow:bounty/<id>`."
+			return "# 404 — Invalid Bounty ID\n\nExpected `/r/g1fhl5xrwkjy3enekd3puz5w8j2d4252uwhewdf4/tavernescrow:bounty/<id>`."
 		}
 		return renderBounty(id)
 	case len(parts) == 1 && parts[0] == "audit":
@@ -52,8 +52,8 @@ func renderHome() string {
 	sb.WriteString(ufmt.Sprintf("| Audit Chain Head | `%s` |\n\n", shortDigest(latestAuditDigest)))
 
 	sb.WriteString("## Navigation\n\n")
-	sb.WriteString("- [Audit Ledger (:audit)](/r/cocvn157/tavernescrow:audit)\n")
-	sb.WriteString("- [Security Invariants (:safety)](/r/cocvn157/tavernescrow:safety)\n\n")
+	sb.WriteString("- [Audit Ledger (:audit)](/r/g1fhl5xrwkjy3enekd3puz5w8j2d4252uwhewdf4/tavernescrow:audit)\n")
+	sb.WriteString("- [Security Invariants (:safety)](/r/g1fhl5xrwkjy3enekd3puz5w8j2d4252uwhewdf4/tavernescrow:safety)\n\n")
 
 	sb.WriteString("## Bounties Board\n\n")
 	if bountiesByID.Size() == 0 {
@@ -84,11 +84,10 @@ func renderHome() string {
 }
 
 func renderBounty(id uint64) string {
-	raw, ok := bountiesByID.Get(padUint64Key(id))
-	if !ok {
+	b, ok := bountiesByID.Get(padUint64Key(id)).(*Bounty)
+	if !ok || b == nil {
 		return ufmt.Sprintf("# 404 — Bounty #%d Not Found\n\n[Back to TavernEscrow](:)", id)
 	}
-	b := raw.(*Bounty)
 
 	var sb strings.Builder
 	sb.WriteString(ufmt.Sprintf("# Bounty #%d — %s\n\n", b.ID, b.Title))

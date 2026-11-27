@@ -1,4 +1,4 @@
-package tavernescrow_test
+package tavernescrow
 
 import (
 	"chain"
@@ -6,8 +6,6 @@ import (
 	"chain/runtime"
 	"strings"
 	"testing"
-
-	"gno.land/r/cocvn157/tavernescrow"
 )
 
 const (
@@ -18,28 +16,25 @@ const (
 )
 
 func realmAddr() address {
-	return chain.PackageAddress("gno.land/r/cocvn157/tavernescrow")
+	return chain.PackageAddress("gno.land/r/g1fhl5xrwkjy3enekd3puz5w8j2d4252uwhewdf4/tavernescrow")
 }
 
 func assertPanics(t *testing.T, label string, fn func()) {
 	t.Helper()
-	defer func() {
-		if recover() == nil {
-			t.Fatalf("expected panic for %s, but succeeded", label)
-		}
-	}()
-	fn()
+	if rec := revive(fn); rec == nil {
+		t.Fatalf("expected panic for %s, but succeeded", label)
+	}
 }
 
-func TestBountyLifecycleHappyPath(t *testing.T) {
+func TestBountyLifecycleHappyPath(cur realm, t *testing.T) {
 	expiry := runtime.ChainHeight() + 500
 	testing.SetRealm(testing.NewUserRealm(sponsorAddr))
 	testing.SetOriginCaller(sponsorAddr)
 	testing.SetOriginSend(chain.NewCoins(chain.NewCoin("ugnot", 3000000)))
 	testing.IssueCoins(realmAddr(), chain.NewCoins(chain.NewCoin("ugnot", 3000000)))
 
-	id := tavernescrow.CreateBounty(
-		cross,
+	id := CreateBounty(
+		cross(cur),
 		"GnoConnect Signing Kit",
 		"Ship deterministic wallet signing adapter with unit tests",
 		arbiterAddr.String(),
@@ -55,29 +50,29 @@ func TestBountyLifecycleHappyPath(t *testing.T) {
 	// Open bounty claimed by worker
 	testing.SetRealm(testing.NewUserRealm(workerAddr))
 	testing.SetOriginSend(chain.Coins{})
-	tavernescrow.ClaimBounty(cross, id)
+	ClaimBounty(cross(cur), id)
 
 	// Submit & approve milestone 0
-	tavernescrow.SubmitMilestone(cross, id, 0, "https://github.com/cocvn157/pr/1", "sha256:abc1234")
+	SubmitMilestone(cross(cur), id, 0, "https://github.com/cocvn157/pr/1", "sha256:abc1234")
 
 	testing.SetRealm(testing.NewUserRealm(sponsorAddr))
-	tavernescrow.ApproveAndRelease(cross, id, 0)
+	ApproveAndRelease(cross(cur), id, 0)
 
 	// Reject then resubmit milestone 1
 	testing.SetRealm(testing.NewUserRealm(workerAddr))
-	tavernescrow.SubmitMilestone(cross, id, 1, "https://github.com/cocvn157/pr/2", "sha256:def5678")
+	SubmitMilestone(cross(cur), id, 1, "https://github.com/cocvn157/pr/2", "sha256:def5678")
 
 	testing.SetRealm(testing.NewUserRealm(sponsorAddr))
-	tavernescrow.RejectMilestone(cross, id, 1, "Missing edge test")
+	RejectMilestone(cross(cur), id, 1, "Missing edge test")
 
 	testing.SetRealm(testing.NewUserRealm(workerAddr))
-	tavernescrow.SubmitMilestone(cross, id, 1, "https://github.com/cocvn157/pr/3", "sha256:fff9999")
+	SubmitMilestone(cross(cur), id, 1, "https://github.com/cocvn157/pr/3", "sha256:fff9999")
 
 	testing.SetRealm(testing.NewUserRealm(sponsorAddr))
-	tavernescrow.ApproveAndRelease(cross, id, 1)
+	ApproveAndRelease(cross(cur), id, 1)
 
-	view := tavernescrow.GetBountyView(id)
-	if view.Status != tavernescrow.StatusCompleted {
+	view := GetBountyView(id)
+	if view.Status != StatusCompleted {
 		t.Fatalf("expected COMPLETED, got %s", view.Status)
 	}
 	if view.ReleasedAmount != 3000000 || view.LockedUgnot != 0 {
@@ -89,24 +84,24 @@ func TestBountyLifecycleHappyPath(t *testing.T) {
 		t.Fatalf("expected worker balance >= 3000000, got %d", workerBal)
 	}
 
-	home := tavernescrow.Render("")
+	home := Render("")
 	if !strings.Contains(home, "GnoConnect Signing Kit") {
 		t.Fatalf("expected Render home to contain bounty title")
 	}
-	detail := tavernescrow.Render("bounty/1")
+	detail := Render("bounty/1")
 	if !strings.Contains(detail, "COMPLETED") {
 		t.Fatalf("expected Render bounty/1 to show COMPLETED")
 	}
 }
 
-func TestDisputeAndArbiterResolution(t *testing.T) {
+func TestDisputeAndArbiterResolution(cur realm, t *testing.T) {
 	expiry := runtime.ChainHeight() + 500
 	testing.SetRealm(testing.NewUserRealm(sponsorAddr))
 	testing.SetOriginSend(chain.NewCoins(chain.NewCoin("ugnot", 2500000)))
 	testing.IssueCoins(realmAddr(), chain.NewCoins(chain.NewCoin("ugnot", 2500000)))
 
-	id := tavernescrow.CreateBounty(
-		cross,
+	id := CreateBounty(
+		cross(cur),
 		"Onyx Indexer",
 		"Deterministic event indexer with gnoweb dashboard",
 		arbiterAddr.String(),
@@ -118,51 +113,51 @@ func TestDisputeAndArbiterResolution(t *testing.T) {
 
 	testing.SetRealm(testing.NewUserRealm(workerAddr))
 	testing.SetOriginSend(chain.Coins{})
-	tavernescrow.SubmitMilestone(cross, id, 0, "https://github.com/cocvn157/indexer", "sha256:11223344")
-	tavernescrow.RaiseDispute(cross, id, 0, "Deliverable passes all vectors")
+	SubmitMilestone(cross(cur), id, 0, "https://github.com/cocvn157/indexer", "sha256:11223344")
+	RaiseDispute(cross(cur), id, 0, "Deliverable passes all vectors")
 
 	// Sponsor cannot reclaim while dispute is active even if blocks skip past expiry
 	testing.SkipHeights(600)
 	testing.SetRealm(testing.NewUserRealm(sponsorAddr))
 	assertPanics(t, "ReclaimExpired during active dispute", func() {
-		tavernescrow.ReclaimExpired(cross, id)
+		ReclaimExpired(cross(cur), id)
 	})
 
 	// Non-arbiter cannot resolve dispute
 	assertPanics(t, "Sponsor resolving dispute", func() {
-		tavernescrow.ResolveDispute(cross, id, 0, false, "self favor")
+		ResolveDispute(cross(cur), id, 0, false, "self favor")
 	})
 
 	// Arbiter releases milestone 0 to worker -> bounty unfreezes back to ACTIVE
 	testing.SetRealm(testing.NewUserRealm(arbiterAddr))
-	tavernescrow.ResolveDispute(cross, id, 0, true, "Tests verified by arbiter")
+	ResolveDispute(cross(cur), id, 0, true, "Tests verified by arbiter")
 
-	view := tavernescrow.GetBountyView(id)
-	if view.Status != tavernescrow.StatusActive || view.ReleasedAmount != 1500000 || view.LockedUgnot != 1000000 {
+	view := GetBountyView(id)
+	if view.Status != StatusActive || view.ReleasedAmount != 1500000 || view.LockedUgnot != 1000000 {
 		t.Fatalf("unexpected dispute state: %+v", view)
 	}
 
 	// Now expired bounty remaining balance can be reclaimed by sponsor
 	testing.SetRealm(testing.NewUserRealm(sponsorAddr))
-	reclaimed := tavernescrow.ReclaimExpired(cross, id)
+	reclaimed := ReclaimExpired(cross(cur), id)
 	if reclaimed != 1000000 {
 		t.Fatalf("expected 1000000 reclaimed, got %d", reclaimed)
 	}
-	view = tavernescrow.GetBountyView(id)
-	if view.Status != tavernescrow.StatusCancelled || view.LockedUgnot != 0 {
+	view = GetBountyView(id)
+	if view.Status != StatusCancelled || view.LockedUgnot != 0 {
 		t.Fatalf("expected CANCELLED with 0 locked, got %+v", view)
 	}
 }
 
-func TestSecurityGuardsAndAdversarialAborts(t *testing.T) {
+func TestSecurityGuardsAndAdversarialAborts(cur realm, t *testing.T) {
 	expiry := runtime.ChainHeight() + 300
 
 	// 1. CodeRealm MITM cannot spoof OriginSend payment
 	testing.SetRealm(testing.NewCodeRealm("gno.land/r/evil/drain"))
 	testing.SetOriginSend(chain.NewCoins(chain.NewCoin("ugnot", 1000000)))
 	assertPanics(t, "CodeRealm CreateBounty", func() {
-		tavernescrow.CreateBounty(
-			cross,
+		CreateBounty(
+			cross(cur),
 			"MITM Attempt",
 			"Should abort at IsUserCall boundary",
 			arbiterAddr.String(),
@@ -177,8 +172,8 @@ func TestSecurityGuardsAndAdversarialAborts(t *testing.T) {
 	testing.SetRealm(testing.NewUserRealm(sponsorAddr))
 	testing.SetOriginSend(chain.NewCoins(chain.NewCoin("ugnot", 500)))
 	assertPanics(t, "Underfunded CreateBounty", func() {
-		tavernescrow.CreateBounty(
-			cross,
+		CreateBounty(
+			cross(cur),
 			"Short Payment",
 			"Milestone requires 1000000 ugnot",
 			arbiterAddr.String(),
@@ -192,8 +187,8 @@ func TestSecurityGuardsAndAdversarialAborts(t *testing.T) {
 	// 3. Create valid bounty to test unauthorized release & double-claim
 	testing.SetOriginSend(chain.NewCoins(chain.NewCoin("ugnot", 1000000)))
 	testing.IssueCoins(realmAddr(), chain.NewCoins(chain.NewCoin("ugnot", 1000000)))
-	id := tavernescrow.CreateBounty(
-		cross,
+	id := CreateBounty(
+		cross(cur),
 		"Guard Check Bounty",
 		"Verify unauthorized transitions abort deterministically",
 		arbiterAddr.String(),
@@ -207,27 +202,27 @@ func TestSecurityGuardsAndAdversarialAborts(t *testing.T) {
 	testing.SetRealm(testing.NewUserRealm(stranger))
 	testing.SetOriginSend(chain.Coins{})
 	assertPanics(t, "Stranger SubmitMilestone", func() {
-		tavernescrow.SubmitMilestone(cross, id, 0, "https://evil.invalid/pr", "deadbeef")
+		SubmitMilestone(cross(cur), id, 0, "https://evil.invalid/pr", "deadbeef")
 	})
 
 	// Worker submits, then worker tries to self-approve
 	testing.SetRealm(testing.NewUserRealm(workerAddr))
-	tavernescrow.SubmitMilestone(cross, id, 0, "https://github.com/cocvn157/ok", "sha256:7777777")
+	SubmitMilestone(cross(cur), id, 0, "https://github.com/cocvn157/ok", "sha256:7777777")
 	assertPanics(t, "Worker self-approve", func() {
-		tavernescrow.ApproveAndRelease(cross, id, 0)
+		ApproveAndRelease(cross(cur), id, 0)
 	})
 
 	// Sponsor approves once, second approve must fail
 	testing.SetRealm(testing.NewUserRealm(sponsorAddr))
-	tavernescrow.ApproveAndRelease(cross, id, 0)
+	ApproveAndRelease(cross(cur), id, 0)
 	assertPanics(t, "Double release", func() {
-		tavernescrow.ApproveAndRelease(cross, id, 0)
+		ApproveAndRelease(cross(cur), id, 0)
 	})
 
-	if !strings.Contains(tavernescrow.Render("audit"), "MILESTONE_RELEASED") {
+	if !strings.Contains(Render("audit"), "MILESTONE_RELEASED") {
 		t.Fatalf("expected audit route to record MILESTONE_RELEASED")
 	}
-	if !strings.Contains(tavernescrow.Render("safety"), "IsUserCall()") {
+	if !strings.Contains(Render("safety"), "IsUserCall()") {
 		t.Fatalf("expected safety route to document IsUserCall invariant")
 	}
 }

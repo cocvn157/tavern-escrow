@@ -451,9 +451,9 @@ func GetBountySummary(bountyID uint64) string {
 }
 
 func mustGetBounty(bountyID uint64) *Bounty {
-	raw, ok := bountiesByID.Get(padUint64Key(bountyID))
-	require(ok, "bounty not found")
-	return raw.(*Bounty)
+	b, ok := bountiesByID.Get(padUint64Key(bountyID)).(*Bounty)
+	require(ok && b != nil, "bounty not found")
+	return b
 }
 
 func appendAudit(action string, bountyID uint64, milestoneIdx int, actor address, amountUgnot int64, note string) {

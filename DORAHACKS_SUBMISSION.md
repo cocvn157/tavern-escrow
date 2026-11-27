@@ -10,7 +10,12 @@
   Deterministic multi-milestone `ugnot` bounty & dispute escrow realm for Gno.land (`onyx-1`) with EOA `IsUserCall()` payment guards, neutral arbiter settlement, `gnoweb` `Render(path)` explorer, chained SHA-256 audit log, and interactive adversarial workbench.
 - **GitHub Repository:** `https://github.com/cocvn157/tavern-escrow`
 - **Live Interactive Workbench (GitHub Pages):** `https://cocvn157.github.io/tavern-escrow/`
-- **Realm / Package Path (Question 2):** `gno.land/r/<your_g1_address>/tavernescrow` (update `gnomod.toml` `module = "gno.land/r/<your_g1_address>/tavernescrow"` before `addpkg`)
+- **Live Deployed Realm (`gnoweb` — Question 1):** `https://onyx.testnets.gno.land/r/g1fhl5xrwkjy3enekd3puz5w8j2d4252uwhewdf4/tavernescrow` (`HTTP 200`, Bounty #1 funded `1,000,000 ugnot`)
+- **Realm / Package Path (Question 2):** `gno.land/r/g1fhl5xrwkjy3enekd3puz5w8j2d4252uwhewdf4/tavernescrow`
+- **Live On-Chain Proof (`onyx-1` via `https://rpc.onyx.testnets.gno.land:443`):**
+  - `maketx addpkg`: Block `#1453448` · TX Hash `/TehXxlBPDy4FgrJywAvtmy7Hk2sq5v2Red5FCPXRHQ=`
+  - `maketx call CreateBounty` (Bounty `#1` · `1,000,000 ugnot`): Block `#1453468` · TX Hash `WxnNK2Eq62km0vtz6HGUrESJO1yVYQwC1Ng/dG6+Uho=`
+  - Live routes verified `HTTP 200`: [Board](https://onyx.testnets.gno.land/r/g1fhl5xrwkjy3enekd3puz5w8j2d4252uwhewdf4/tavernescrow) · [Bounty #1](https://onyx.testnets.gno.land/r/g1fhl5xrwkjy3enekd3puz5w8j2d4252uwhewdf4/tavernescrow:bounty/1) · [Audit](https://onyx.testnets.gno.land/r/g1fhl5xrwkjy3enekd3puz5w8j2d4252uwhewdf4/tavernescrow:audit) · [Safety](https://onyx.testnets.gno.land/r/g1fhl5xrwkjy3enekd3puz5w8j2d4252uwhewdf4/tavernescrow:safety)
 - **Is this a new project? (Question 4):** New project created specifically during Gnome Tavern Hackathon (Nov 2026).
 - **Country of residence (Question 7):** Vietnam
 - **Contact for prize verification (Question 8):** `cocvn157@gmail.com`
@@ -20,7 +25,31 @@
 
 ## 2. Required 1-Minute Manual Testnet Deployment (`faucet.gno.land` + `gnokey`)
 
-Because `https://faucet.gno.land` enforces an interactive human verification gate (and `gno`/`gnokey` must sign with your local keystore), run these steps once on a machine with `gnokey` installed before pasting the final `gnoweb` link into DoraHacks Question 1:
+Because `https://faucet.gno.land` enforces an interactive human verification gate (and `gno`/`gnokey` must sign with your local keystore), run these steps once before pasting the final `gnoweb` link into DoraHacks Question 1.
+
+> **Windows Availability Check (`gnolang/gno` `v1.8.0`):**
+> Official GitHub releases (`https://github.com/gnolang/gno/releases/tag/v1.8.0`) currently publish `linux_*` and `darwin_*` binaries only (no native Windows `.exe` asset). On Windows, choose **Option A** (native build via Go `>= 1.25.9`) or **Option B** (WSL2 Linux binary):
+>
+> **Option A — Native Windows via Go (`go.mod` requires `go 1.25.9`):**
+> ```powershell
+> winget install GoLang.Go
+> # Reopen PowerShell so `go` is on PATH, then:
+> go install github.com/gnolang/gno/gno.land/cmd/gnokey@v1.8.0
+> go install github.com/gnolang/gno/gnovm/cmd/gno@v1.8.0
+> $env:Path += ";$env:USERPROFILE\go\bin"
+> gnokey version; gno version
+> ```
+>
+> **Option B — WSL2 Ubuntu + Official `v1.8.0` Prebuilt Linux Binaries:**
+> ```powershell
+> wsl --install -d Ubuntu
+> # Inside WSL Ubuntu:
+> curl -L -o /usr/local/bin/gnokey https://github.com/gnolang/gno/releases/download/v1.8.0/gnokey_linux_amd64
+> curl -L -o /usr/local/bin/gno https://github.com/gnolang/gno/releases/download/v1.8.0/gno_linux_amd64
+> chmod +x /usr/local/bin/gnokey /usr/local/bin/gno
+> ```
+>
+> **Live Endpoint Check:** `https://rpc.onyx.testnets.gno.land/status` (`HTTP 200`, `chainid: onyx-1`), `https://onyx.testnets.gno.land/` (`HTTP 200`), and `https://faucet.gno.land` (`HTTP 200`). *(Note: `rpc.onyx-1.gno.land` is invalid/unreachable — always use `https://rpc.onyx.testnets.gno.land:443`.)*
 
 1. **Create or inspect your local `gnokey` key:**
    ```bash
